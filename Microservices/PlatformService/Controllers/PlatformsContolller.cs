@@ -30,8 +30,7 @@ namespace PlatformService.Controllers
         }
 
         [HttpGet("{id}", Name = "GetPlatformById")]
-
-        public ActionResult<IEnumerable<PlatformReadDto>> GetPlatformById(int id)
+        public ActionResult<PlatformReadDto> GetPlatformById(int id)
         {
             Console.WriteLine("-->Getting Platform...");
 
@@ -39,10 +38,24 @@ namespace PlatformService.Controllers
 
             if(platformItem != null)
             {
-                return Ok(_mapper.Map<IEnumerable<PlatformReadDto>>(platformItem));
+                return Ok(_mapper.Map<PlatformReadDto>(platformItem));
             }
             return NotFound();
+        }
 
+        [HttpPost]
+        public ActionResult<PlatformReadDto> CreatePlatform(PlatformCreateDto platformCreateDto)
+        {
+            Console.WriteLine("-->Creating Platform...");
+
+            var platformModel = _mapper.Map<Platform>(platformCreateDto);
+            _repository.CreatePlatform(platformModel);
+            _repository.SaveChanges();
+
+            var platformReadDto = _mapper.Map<PlatformReadDto>(platformModel);
+
+
+            return CreatedAtRoute(nameof(GetPlatformById), new { Id = platformReadDto.Id }, platformReadDto);          
 
         }
     }
